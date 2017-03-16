@@ -1,0 +1,25 @@
+//改变二维数组长度，数据全部保留
+template<class T>
+void changeLength2D(T**& a,int oldRows, int oldColumns, int newRows, int newColumns)
+{
+    //初始化数组一维大小
+    T** temp = new T* [newRows];
+
+    //初始化数组二维大小
+    for(int i=0;i<newRows;i++)
+        temp[i] = new int[newColumns];
+
+    //把原来数据复制到新数组中
+    for(int i=0;i<oldRows;i++)
+    {
+        for(int j=0;j<oldColumns;j++)
+        {
+            temp[i][j]=a[i][j];
+        }
+    }
+
+    //释放旧数组的内存，防止内存泄漏
+    delete [] a;
+
+    a=temp;
+}
