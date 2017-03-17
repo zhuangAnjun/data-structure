@@ -1,0 +1,120 @@
+#include<iostream>
+
+using namespace std;
+
+template<class T>
+class linearList
+{
+    public:
+        virtual ~linearList() {};
+        virtual bool empty() const=0;
+        virtual int size() const=0;
+        virtual void insert(int theIndex, const T& theElement) = 0;
+};
+
+template<class T>
+class arrayList : public linearList<T>
+{
+    public:
+        arrayList(int initialCapacity = 10);
+        arrayList(const arrayList<T>&);
+        arrayList(int initialCapacity = 10, const int theChangeLength=0);
+        ~arrayList()
+        {
+            delete [] element;
+        }
+
+        bool empty() const
+        {
+            return listSize == 0;
+        }
+        int size() const
+        {
+            return listSize;
+        }
+
+        void insert(int theIndex, const T& theElement);
+
+        void changeLength1D(int oldLength, int newLength);
+        //获取数组容量
+        int capacity() const
+        {
+            return arrayLength;
+        }
+
+    protected:
+
+        T* element;     //线性表元素的一维数组
+        int arrayLength;        //一维数组容量
+        int listSize;       //线性表的元素个数
+        int changeLength;   //指定的数组满时的扩大长度，若等于0，则把数组扩大一倍
+};
+
+//arrayList的默认构造函数
+template<class T>
+arrayList<T>::arrayList(int initialCapacity)
+{
+    arrayLength = initialCapacity;
+    element = new T[arrayLength];
+    listSize = 0;
+}
+
+//arrayList的复制构造函数
+template<class T>
+arrayList<T>::arrayList(const arrayList<T>& theList)
+{
+    arrayLength = theList.arrayLength;
+    element = new T[arrayLength];
+    listSize = theList.listSize;
+    copy(theList.element, theList.element + listSize, element);
+}
+
+//指定长度的构造函数，在空间满时用来改变数组长度。若未指定，在数组满时将空间加倍。
+template<class T>
+arrayList<T>::arrayList(int initialCapacity, const int theChangeLength)
+{
+    arrayLength = initialCapacity;
+    element = new T[arrayLength];
+    listSize = 0;
+    changeLength = theChangeLength;
+}
+
+//改变一维数组长度
+template<class T>
+void arrayList<T>::changeLength1D(int oldLength, int addLength)
+{
+    T *temp = new T[addLength + oldLength];
+    for(int i=0;i<oldLength;i++)
+        temp[i]=element[i];
+    arrayLength = addLength + oldLength;
+    delete [] element;
+    element = temp;
+}
+
+//插入函数，当数组满时，用指定长度改变数组长度，若无指定长度，将数组扩大一倍。
+template<class T>
+void arrayList<T>::insert(int theIndex, const T& theElement)
+{
+    if(arrayLength == listSize)
+    {
+        if(changeLength == 0)
+            changeLength1D(arrayLength, arrayLength);
+        else
+            changeLength1D(arrayLength, changeLength);
+    }
+    for(int i=listSize-1; i>theIndex; i--)
+        element[i+1]=element[i];
+    element[theIndex]=theElement;
+    listSize++;
+}
+
+//测试
+int main()
+{
+    arrayList<int> a(9,12);
+    for(int i=0;i<9;i++)
+        a.insert(0,i);
+    a.insert(6,10);
+    cout<<a.size()<<endl;
+    cout<<a.capacity()<<endl;
+}
